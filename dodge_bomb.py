@@ -7,6 +7,18 @@ import pygame as pg
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
+    """
+    引数：こうかとんRect or 爆弾Rect
+    戻り値：判定結果タプル（横判定結果、縦判定結果）
+    Ttue OR False
+    """
+    yoko, tate = True, True
+    if rct.left < 0 or WIDTH < rct.right:  # 縦判定
+        yoko = False
+    if rct.top < 0 or HEIGHT < rct.bottom:  # 横判定
+        tate = False
+    return yoko, tate
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -58,9 +70,18 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]#横移動量
                 sum_mv[1] += mv[1]#縦移動量
-
         kk_rct.move_ip(sum_mv)
+        if check_bound(kk_rct) != (True,True):
+            kk_rct.move_ip(-sum_mv[0],-sum_mv[1])#動きをキャンセル
+        screen.blit(kk_img,kk_rct)
+        
         bb_rct.move_ip(vx, vy)
+        yoko, tate = check_bound(bb_rct)
+        if not yoko:
+            vx *= -1
+        if not tate:
+            vy *= -1
+
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
         pg.display.update()
