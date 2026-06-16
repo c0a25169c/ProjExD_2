@@ -7,6 +7,33 @@ import pygame as pg
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
+
+def gameover(screen: pg.Surface) -> None:
+    """
+    引数：Surface
+    戻り値：None
+    """
+    blackout = pg.Surface((WIDTH,HEIGHT))  # ブラックアウト
+    blackout.fill((0, 0, 0))
+    blackout.set_alpha(200)  # 透明度
+
+    font = pg.font.Font(None, 80)  # ゲームオーバー文字
+    text = font.render("Game Over", True,(255, 255, 255))
+    text_rct = text.get_rect(center=(WIDTH//2, HEIGHT//2))
+
+    kk8_img = pg.transform.rotozoom(pg.image.load("fig/8.png"), 0, 1)  # 泣いているこうかとん
+    kk8_rct1 = kk8_img.get_rect(center=(WIDTH//2 + 200, HEIGHT//2))
+    kk8_rct2 = kk8_img.get_rect(center=(WIDTH//2 - 200, HEIGHT//2))
+
+    screen.blit(blackout, (0, 0))
+    screen.blit(text, text_rct)
+    screen.blit(kk8_img, kk8_rct1)
+    screen.blit(kk8_img, kk8_rct2)
+    pg.display.update()
+
+    pg.time.wait(5000)
+
+
 def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
     """
     引数：こうかとんRect or 爆弾Rect
@@ -19,6 +46,7 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
     if rct.top < 0 or HEIGHT < rct.bottom:  # 縦判定
         tate = False
     return yoko, tate
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -55,7 +83,7 @@ def main():
             if event.type == pg.QUIT: 
                 return
         if kk_rct.colliderect(bb_rct):  # こうかとん　爆弾　重なったら
-            print("ゲームオーバー")
+            gameover(screen)
             return
         screen.blit(bg_img, [0, 0]) 
 
