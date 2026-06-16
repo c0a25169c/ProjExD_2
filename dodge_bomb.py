@@ -56,18 +56,18 @@ def get_kk_imgs() -> dict[tuple[int,int],pg.Surface]:
     img_flip = pg.transform.flip(img, True, False) 
 
     return {
-        (0, 0): img,  # キー押下なし
-        (-5, 0): img,  # 左
-        (+5, 0): img_flip,  # 右
+        (0, 0): img, # キー押下なし
+        (-5, 0): img, # 左
+        (+5, 0): img_flip, # 右
 
-        (0, -5): pg.transform.rotozoom(img, -90, 1.0),        # 上
-        (0, +5): pg.transform.rotozoom(img, +90, 1.0),       # 下
+        (0, -5): pg.transform.rotozoom(img, -90, 1.0), # 上
+        (0, +5): pg.transform.rotozoom(img, +90, 1.0), # 下
 
-        (-5, -5): pg.transform.rotozoom(img, -45, 1.0),       # 左上
-        (-5, +5): pg.transform.rotozoom(img, +45, 1.0),      # 左下
+        (-5, -5): pg.transform.rotozoom(img, -45, 1.0), # 左上
+        (-5, +5): pg.transform.rotozoom(img, +45, 1.0), # 左下
 
         (+5, -5): pg.transform.rotozoom(img_flip, +45, 1.0), # 右上
-        (+5, +5): pg.transform.rotozoom(img_flip, -45, 1.0),  # 右下
+        (+5, +5): pg.transform.rotozoom(img_flip, -45, 1.0), # 右下
     }
 
 
@@ -86,6 +86,7 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
         bb_imgs.append(bb_img)
     return bb_imgs, bb_accs
+
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
