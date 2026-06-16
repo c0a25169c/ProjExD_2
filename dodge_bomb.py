@@ -2,7 +2,7 @@ import os
 import random
 import sys
 import pygame as pg
-
+import time
 
 WIDTH, HEIGHT = 1100, 650
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -30,8 +30,7 @@ def gameover(screen: pg.Surface) -> None:
     screen.blit(kk8_img, kk8_rct1)
     screen.blit(kk8_img, kk8_rct2)
     pg.display.update()
-
-    pg.time.wait(5000)
+    time.sleep(5)
 
 
 def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
@@ -48,13 +47,39 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
     return yoko, tate
 
 
+def get_kk_imgs() -> dict[tuple[int,int],pg.Surface]:
+    """
+    移動量タプルと対応するこうかとん画像Surfaceの辞書を返す関数
+    戻り値: 移動量タプルをキー、画像Surfaceを値とした辞書
+    """
+    img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    img_flip = pg.transform.flip(img, True, False) 
+
+    return {
+        (0, 0): img,                     # キー押下なし
+        (-5, 0): img,                    # 左
+        (+5, 0): img_flip,               # 右
+
+        (0, -5): pg.transform.rotozoom(img, -90, 1.0),        # 上
+        (0, +5): pg.transform.rotozoom(img, +90, 1.0),       # 下
+
+        (-5, -5): pg.transform.rotozoom(img, -45, 1.0),       # 左上
+        (-5, +5): pg.transform.rotozoom(img, +45, 1.0),      # 左下
+
+        (+5, -5): pg.transform.rotozoom(img_flip, +45, 1.0), # 右上
+        (+5, +5): pg.transform.rotozoom(img_flip, -45, 1.0),  # 右下
+    }
+
+
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("fig/pg_bg.jpg")  
 
     # こうかとんの初期化
-    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_imgs = get_kk_imgs()
+    kk_img = kk_imgs[(0, 0)]  # 左向き
     kk_rct = kk_img.get_rect()
     kk_rct.center = 300, 200
 
@@ -101,6 +126,9 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]#横移動量
                 sum_mv[1] += mv[1]#縦移動量
+        direction = (sum_mv[0], sum_mv[1])
+        kk_img = kk_imgs[direction]  # こうかとん切り替え
+
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True,True):
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])#動きをキャンセル
