@@ -14,9 +14,9 @@ def check_bound(rct: pg.Rect) -> tuple[bool,bool]:
     Ttue OR False
     """
     yoko, tate = True, True
-    if rct.left < 0 or WIDTH < rct.right:  # 縦判定
+    if rct.left < 0 or WIDTH < rct.right:  # 横判定
         yoko = False
-    if rct.top < 0 or HEIGHT < rct.bottom:  # 横判定
+    if rct.top < 0 or HEIGHT < rct.bottom:  # 縦判定
         tate = False
     return yoko, tate
 
@@ -54,6 +54,9 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+        if kk_rct.colliderect(bb_rct):  # こうかとん　爆弾　重なったら
+            print("ゲームオーバー")
+            return
         screen.blit(bg_img, [0, 0]) 
 
         key_lst = pg.key.get_pressed()
