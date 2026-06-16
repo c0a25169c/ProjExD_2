@@ -56,9 +56,9 @@ def get_kk_imgs() -> dict[tuple[int,int],pg.Surface]:
     img_flip = pg.transform.flip(img, True, False) 
 
     return {
-        (0, 0): img,                     # キー押下なし
-        (-5, 0): img,                    # 左
-        (+5, 0): img_flip,               # 右
+        (0, 0): img,  # キー押下なし
+        (-5, 0): img,  # 左
+        (+5, 0): img_flip,  # 右
 
         (0, -5): pg.transform.rotozoom(img, -90, 1.0),        # 上
         (0, +5): pg.transform.rotozoom(img, +90, 1.0),       # 下
@@ -71,6 +71,21 @@ def get_kk_imgs() -> dict[tuple[int,int],pg.Surface]:
     }
 
 
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    '''
+    爆弾の拡大画像リストと加速度リストを生成する関数
+    戻り値：bb_imgs (list[Surface]):半径10～100の爆弾Surfaceを10段階で格納したリスト
+    bb_accs (list[int]):加速度(1～10)のリスト
+    '''
+    bb_imgs = []
+    bb_accs = [a for a in range(1, 11)]
+
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        bb_img.set_colorkey((0, 0, 0))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_imgs.append(bb_img)
+    return bb_imgs, bb_accs
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -84,6 +99,7 @@ def main():
     kk_rct.center = 300, 200
 
     # 爆弾の初期化
+    bb_imgs, bb_accs = init_bb_imgs()
     bb_img = pg.Surface((20,20))  # 爆弾用のSurface
     pg.draw.circle(bb_img,(255,0,0),(10,10),10)  # 赤丸半径10
     bb_img.set_colorkey((0,0,0))
@@ -134,12 +150,25 @@ def main():
             kk_rct.move_ip(-sum_mv[0],-sum_mv[1])#動きをキャンセル
         screen.blit(kk_img,kk_rct)
         
-        bb_rct.move_ip(vx, vy)
+        #bb_rct.move_ip(vx, vy)
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             vx *= -1
         if not tate:
             vy *= -1
+
+    
+        idx = min(tmr // 500, 9) # tmrの値に応じて段階を決定(0～9)
+        # 加速した速度
+        avx = vx * bb_accs[idx]
+        avy = vy * bb_accs[idx]
+
+        bb_img = bb_imgs[idx] # 爆弾の画像を拡大版に差し替え
+        bb_rct.width = bb_img.get_width()
+        bb_rct.height = bb_img.get_height()
+
+        bb_rct.move_ip(avx, avy)
+
 
         screen.blit(kk_img, kk_rct)
         screen.blit(bb_img, bb_rct)
